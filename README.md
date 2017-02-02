@@ -1,6 +1,6 @@
 # compare-sqlalchemy-speed
 
-Compare the speed of sqlalchemy.
+Compare the speed of sqlalchemy ORM vs core.
 
 ## Requirements
 
@@ -89,5 +89,20 @@ This option has three types:
 You can also test two selection types using `--select_type` option.
 
 - user:  select 100 users in deceingin order of age.
-- team:  select 100 users in decenging order of age for each team.
 
+```python
+[{'id': 1, 'name': 'John1', 'age': 10, 'team': 'J'},{...}, ...]
+```
+
+- team:  select 100 users in decenging order of age in each team.
+
+```ptyhon
+[{'id': 1, 'name': 'A', 'users: [{'id': 500, 'name': 'Shun', 'age': 23}, {...}, ...]},
+ {...}, ...]
+```
+
+- count: count users　whose age is under 50 in each team.
+
+```python
+{'A': 3245, 'B': 23245, ....}
+```

@@ -32,7 +32,7 @@ if __name__ == '__main__':
     argp.add_argument("-t", "--team_num", dest="n_team", type=int, default=26,
                       help="Number of teams (default: 26)")
     argp.add_argument("--select_type", dest="select_type", type=str, default="user",
-                      help="Selection types (user/team default: 'user')\n user: select users order by age, team: select users for each team")
+                      help="Selection types (user/team/count default: 'user')\n user: select users order by age, team: select users in each team, count: count users in each team")
     argp.add_argument("--config-db", dest="config_db", type=str, default="./resources/config/database.json",
                       help="Database configuration file path (default: ./resources/config/database.json)")
 
@@ -64,7 +64,7 @@ if __name__ == '__main__':
         s = time.time()
         result = select_data(args.select_option, args.select_type)
         print('elapsed time: {0:.4f} [sec]'.format(time.time() - s))
-
+        print(result)
     else:
         print("Please input correct mode.\n")
         print(argp.parse_args('-h'.split()))

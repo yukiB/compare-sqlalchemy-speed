@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import absolute_import, with_statement, print_function, unicode_literals
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, and_, func
 import sqlalchemy_test.database as database
 from sqlalchemy_test.model.user import User
 from sqlalchemy_test.model.team import Team
@@ -156,11 +156,67 @@ def select_data_user(option):
     return result
 
 
+def count_user_orm():
+    teams = select_teams_orm()
+    counts = {tm.name: User.query()\
+              .filter(and_(User.team == tm, User.age < 50)).count()\
+              for tm in teams}
+    return counts
+
+
+def count_user_core():
+    teams = select_teams_core()
+    sess = lambda sel: database.session().execute(sel)
+    u = User.__table__.c
+    counts = {tm['name']: sess(
+        select([func.count()]).select_from(User.__table__)\
+        .where(and_(u.team_id == tm['id'], u.age < 50))\
+    ).scalar() for tm in teams}
+    return counts
+
+
+def count_user(team):
+    global _session
+    u = User.__table__.c
+    sel = select([func.count()]).select_from(User.__table__)\
+          .where(and_(u.team_id == team['id'], u.age < 50))
+    result = _session.execute(sel).scalar()
+    return result
+
+
+def count_user_multi():
+    global _session
+    teams = select_teams_core()
+    _session = database.create_local_session()
+    p = Pool(multi.cpu_count())
+    counts = p.map(count_user, teams)
+    counts = {t['name']: c for t, c in zip(teams, counts)}
+    p.close()
+    _session.close()
+    return counts
+    
+
+
+def count_users(option):
+    if option == 'orm':
+        result = count_user_orm()
+    elif option == 'core':
+        result = count_user_core()
+    elif option == 'multi':
+        result = count_user_multi()
+    else:
+        print('option is wrong')
+        result = {}
+    return result
+
+
 def select_data(option, select_type):
     if select_type == 'team':
         result = select_data_team(option)
     elif select_type == 'user':
         result = select_data_user(option)
+    elif select_type == 'count':
+        result = count_users(option)
     else:
         print('select_type is wrong')
         result = []
