@@ -1,4 +1,4 @@
-# sqlalchemy-test
+# compare-sqlalchemy-speed
 
 Compare the speed of sqlalchemy.
 
@@ -29,6 +29,25 @@ Prepare configuration files in according to `resources/config/*.example` files.
 
 - `database.json`
 
+### Test Data Structure
+
+sqlalcyemy_test db has two tables, user and team.
+
+##### user table
+
+| id  | name  |  age  | team_id |created_at|updated_at|
+|:---:|:-----:|:-----:|:-------:|:--------:|:--------:|
+|  1  | John1 |  12   |    4    |1486030539|1486030539|
+|  2  |Kevin2 |  54   |    12   |1486030539|1486030539|
+
+
+##### team table
+
+| id  | name  |created_at|updated_at|
+|:---:|:-----:|:--------:|:--------:|
+|  1  | John1 |1486030539|1486030539|
+|  2  |Kevin2 |1486030539|1486030539|
+  
 ### Insert data to DB
 
 To insert dummy data
@@ -47,7 +66,7 @@ sqlalchemy-test -h
 
 This option has three types:
 
-- single: single insert with sqlalchemy ORM
+- single: single insert with sqlalchemy ORM (default)
 - multi:  multi insert with sqlalchemy ORM
 - core:   multi insert with sqlalchemy core
 
@@ -63,6 +82,12 @@ You can set options for insertion with `-s/--select_option`.
 
 This option has three types:
 
-- orm: select with sqlalchemy ORM
+- orm:   select with sqlalchemy ORM (default)
 - core:  select with sqlalchemy core
 - multi: parallelized selection using multiprocessing
+
+You can also test two selection types using `--select_type` option.
+
+- user:  select 100 users in deceingin order of age.
+- team:  select 100 users in decenging order of age for each team.
+

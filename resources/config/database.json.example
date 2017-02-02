@@ -1,0 +1,4 @@
+{"host": "localhost",
+ "user": "sqlalchemy_test",
+ "password": "pa55w0rd",
+ "name": "sqlalchemy_test"}
