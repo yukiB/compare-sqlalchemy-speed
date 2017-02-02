@@ -84,7 +84,7 @@ if __name__ == '__main__':
     elif str(mode) == 'bulk_size':
         delete_data()
         data_list, team_list = create_data_list(args.n_user, args.n_team)
-        size_list = [10,20,50,100,150,200,500,750,1000,5000,10000]
+        size_list = [10,20,50,100,150,200,500,750,1000,5000,10000,20000]
         for s in size_list:
             delete_data()
             core_insertion(data_list, team_list, s)
