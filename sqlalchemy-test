@@ -33,7 +33,7 @@ def delete_data():
 if __name__ == '__main__':
     argp = argparse.ArgumentParser()
     argp.add_argument("mode",
-                      help="Mode of data management. (insert/select/insert_all/select_all/bulk_size)")
+                      help="Mode of data management. (insert/select/insert_all/select_all/select_all/bulk_size)")
     argp.add_argument("-i", "--insert_option", dest="insert_option", type=str, default="single",
                       help="Chose insertion ways (single/multi/bulk/core default: 'single')")
     argp.add_argument("-s", "--select_option", dest="select_option", type=str, default="orm",
@@ -65,11 +65,6 @@ if __name__ == '__main__':
         insert_data(data_list, team_list, args.insert_option)
         print('total elapsed time: {0:.3f} [sec]'.format(time.time() - s))
 
-    elif str(mode) == "select":
-        s = time.time()
-        result = select_data(args.select_option, args.select_type)
-        print('elapsed time: {0:.4f} [sec]'.format(time.time() - s))
-
     elif str(mode) == 'insert_all':
         delete_data()
         data_list, team_list = create_data_list(args.n_user, args.n_team)
@@ -88,6 +83,23 @@ if __name__ == '__main__':
         for s in size_list:
             delete_data()
             core_insertion(data_list, team_list, s)
+
+    elif str(mode) == "select":
+        s = time.time()
+        result = select_data(args.select_option, args.select_type)
+        print('elapsed time: {0:.4f} [sec]'.format(time.time() - s))
+
+    elif str(mode) == "select_all":
+        s = time.time()
+        result = select_data('orm', args.select_type)
+        print('sqlAlchemy ORM: elapsed time: {0:.4f} [sec]'.format(time.time() - s))
+        s = time.time()
+        result = select_data('core', args.select_type)
+        print('sqlAlchemy core: elapsed time: {0:.4f} [sec]'.format(time.time() - s))
+        s = time.time()
+        result = select_data('multi', args.select_type)
+        print('sqlAlchemy core with multiprocessing: elapsed time: {0:.4f} [sec]'.format(time.time() - s))
+        
     else:
         print("Please input correct mode.\n")
         print(argp.parse_args('-h'.split()))
