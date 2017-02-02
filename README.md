@@ -97,7 +97,7 @@ You can also test two selection types using `--select_type` option.
 - team:  select 100 users in decenging order of age in each team.
 
 ```ptyhon
-[{'id': 1, 'name': 'A', 'users: [{'id': 500, 'name': 'Shun', 'age': 23}, {...}, ...]},
+[{'id': 1, 'name': 'A', 'users': [{'id': 500, 'name': 'Shun', 'age': 23}, {...}, ...]},
  {...}, ...]
 ```
 
