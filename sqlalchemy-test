@@ -10,7 +10,7 @@ import sqlalchemy_test.database as database
 from sqlalchemy_test.model.user import User
 from sqlalchemy_test.model.team import Team
 from sqlalchemy_test.data import create_data_list
-from sqlalchemy_test.insert import insert_data
+from sqlalchemy_test.insert import insert_data, core_insertion
 from sqlalchemy_test.select import select_data
 import time
 import re
@@ -33,7 +33,7 @@ def delete_data():
 if __name__ == '__main__':
     argp = argparse.ArgumentParser()
     argp.add_argument("mode",
-                      help="Mode of data management. (insert/select/insert_all/select_all)")
+                      help="Mode of data management. (insert/select/insert_all/select_all/bulk_size)")
     argp.add_argument("-i", "--insert_option", dest="insert_option", type=str, default="single",
                       help="Chose insertion ways (single/multi/bulk/core default: 'single')")
     argp.add_argument("-s", "--select_option", dest="select_option", type=str, default="orm",
@@ -73,7 +73,6 @@ if __name__ == '__main__':
     elif str(mode) == 'insert_all':
         delete_data()
         data_list, team_list = create_data_list(args.n_user, args.n_team)
-        delete_data()
         insert_data(data_list, team_list, 'single')
         delete_data()
         insert_data(data_list, team_list, 'multi')
@@ -82,7 +81,13 @@ if __name__ == '__main__':
         delete_data()
         insert_data(data_list, team_list, 'core')
 
-        
+    elif str(mode) == 'bulk_size':
+        delete_data()
+        data_list, team_list = create_data_list(args.n_user, args.n_team)
+        size_list = [10,20,50,100,150,200,500,750,1000,5000,10000]
+        for s in size_list:
+            delete_data()
+            core_insertion(data_list, team_list, s)
     else:
         print("Please input correct mode.\n")
         print(argp.parse_args('-h'.split()))

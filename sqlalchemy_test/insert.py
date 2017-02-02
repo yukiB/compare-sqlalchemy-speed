@@ -5,6 +5,7 @@ import sqlalchemy_test.database as database
 from sqlalchemy_test.model.user import User
 from sqlalchemy_test.model.user import UserTable
 from sqlalchemy_test.model.team import Team
+from more_itertools import chunked
 from joblib import Parallel, delayed
 import time, sys
 
@@ -67,7 +68,7 @@ def bulk_insertion(data_list, team_list):
     print('{0} elapsed time of insertion: {1:.3f} [sec]'.format(header, time.time() - start))
 
 
-def core_insertion(data_list, team_list):
+def core_insertion(data_list, team_list, size=None):
     teams = [Team.create_dict(t) for t in team_list]
     database.session().execute(Team.__table__.insert(), teams)
     database.session().commit()
@@ -76,10 +77,17 @@ def core_insertion(data_list, team_list):
                                  (d[0], d[1], team_dict[d[2]]) for d in data_list])
     #users = [User.create_dict(d[0], d[1], team_dict[d[2]]) for d in data_list]
     start = time.time()
-    database.session().execute(User.__table__.insert(), users)
-    database.session().commit()
-    header = 'SqlAlchemy core bulk insert:'
-    print('{0} elapsed time of insertion: {1:.3f} [sec]'.format(header, time.time() - start))
+    if not size:
+        database.session().execute(User.__table__.insert(), users)
+        database.session().commit()
+        header = 'SqlAlchemy core bulk insert:'
+        print('{0} elapsed time of insertion: {1:.3f} [sec]'.format(header, time.time() - start))
+    else:
+        chunked_data = chunked(users, size)
+        [database.session().execute(User.__table__.insert(), cd) for cd in chunked_data]
+        database.session().commit()
+        header = 'SqlAlchemy core bulk insert ({0}):'.format(size)
+        print('{0} elapsed time of insertion: {1:.3f} [sec]'.format(header, time.time() - start))
 
     
 def insert_data(data_list, team_list, option):
@@ -93,3 +101,4 @@ def insert_data(data_list, team_list, option):
         core_insertion(data_list, team_list)
     else:
         print('option is wrong')
+        
