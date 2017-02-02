@@ -26,8 +26,8 @@ def single_insertion(data_list, team_list):
     team_dict = {t: insert_team(t) for t in team_list}
     start = time.time()
     [insert_user(d[0], d[1], team_dict[d[2]]) for d in data_list]
-    sys.stderr.write('SqlAlchemy ORM: ')
-    print('elapsed time of insertion: {0:.3f} [sec]'.format(time.time() - start))
+    header = 'SqlAlchemy ORM:'
+    print('{0} elapsed time of insertion: {1:.3f} [sec]'.format(header, time.time() - start))
 
 
 def multi_insertion(data_list, team_list):
@@ -43,8 +43,8 @@ def multi_insertion(data_list, team_list):
     start = time.time()
     database.session().add_all(users)
     database.session().commit()
-    sys.stderr.write('SqlAlchemy ORM multi insert: ')
-    print('elapsed time of insertion: {0:.3f} [sec]'.format(time.time() - start))
+    header = 'SqlAlchemy ORM multi insert:'
+    print('{0} elapsed time of insertion: {1:.3f} [sec]'.format(header, time.time() - start))
     
     
 def bulk_insertion(data_list, team_list):
@@ -63,8 +63,8 @@ def bulk_insertion(data_list, team_list):
                    created_at = time.time())
          for d in data_list], return_defaults=True)
     database.session().commit()
-    sys.stderr.write('SqlAlchemy ORM bulk insert: ')
-    print('elapsed time of insertion: {0:.3f} [sec]'.format(time.time() - start))
+    header = 'SqlAlchemy ORM bulk insert:'
+    print('{0} elapsed time of insertion: {1:.3f} [sec]'.format(header, time.time() - start))
 
 
 def core_insertion(data_list, team_list):
@@ -78,8 +78,8 @@ def core_insertion(data_list, team_list):
     start = time.time()
     database.session().execute(User.__table__.insert(), users)
     database.session().commit()
-    sys.stderr.write('SqlAlchemy core bulk insert: ')
-    print('elapsed time of insertion: {0:.3f} [sec]'.format(time.time() - start))
+    header = 'SqlAlchemy core bulk insert:'
+    print('{0} elapsed time of insertion: {1:.3f} [sec]'.format(header, time.time() - start))
 
     
 def insert_data(data_list, team_list, option):
