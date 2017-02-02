@@ -17,18 +17,29 @@ import re
 import sys
 import io
 
+
 logger = logging.getLogger(__name__)
+
+
+def delete_data():
+    User.query().delete()
+    Team.query().delete()
+    database.session().commit()
+    database.session().execute("ALTER TABLE user AUTO_INCREMENT = 1;")
+    database.session().execute("ALTER TABLE team AUTO_INCREMENT = 1;")
+    database.session().commit()
+    
 
 if __name__ == '__main__':
     argp = argparse.ArgumentParser()
     argp.add_argument("mode",
-                      help="Mode of data management. (insert/select)")
+                      help="Mode of data management. (insert/select/insert_all/select_all)")
     argp.add_argument("-i", "--insert_option", dest="insert_option", type=str, default="single",
-                      help="Chose insertion ways (single/multi/core default: 'single')")
+                      help="Chose insertion ways (single/multi/bulk/core default: 'single')")
     argp.add_argument("-s", "--select_option", dest="select_option", type=str, default="orm",
                       help="Chose selection ways (orm/core/multi default: 'orm')")
-    argp.add_argument("-u", "--user_num", dest="n_user", type=int, default=5000,
-                      help="Number of users (default: 5000)")
+    argp.add_argument("-u", "--user_num", dest="n_user", type=int, default=100000,
+                      help="Number of users (default: 100000)")
     argp.add_argument("-t", "--team_num", dest="n_team", type=int, default=26,
                       help="Number of teams (default: 26)")
     argp.add_argument("--select_type", dest="select_type", type=str, default="user",
@@ -47,13 +58,7 @@ if __name__ == '__main__':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
     if str(mode) == 'insert':
-        User.query().delete()
-        Team.query().delete()
-        database.session().commit()
-        database.session().execute("ALTER TABLE user AUTO_INCREMENT = 1;")
-        database.session().execute("ALTER TABLE team AUTO_INCREMENT = 1;")
-        database.session().commit()
-
+        delete_data()
         data_list, team_list = create_data_list(args.n_user, args.n_team)
         print('Created Data.')
         s = time.time()
@@ -64,6 +69,27 @@ if __name__ == '__main__':
         s = time.time()
         result = select_data(args.select_option, args.select_type)
         print('elapsed time: {0:.4f} [sec]'.format(time.time() - s))
+
+    elif str(mode) == 'insert_all':
+        delete_data()
+        data_list, team_list = create_data_list(args.n_user, args.n_team)
+        sys.stderr.write('SqlAlchemy ORM: ')
+        delete_data()
+        insert_data(data_list, team_list, 'single')
+        delete_data()
+        sys.stderr.write('SqlAlchemy ORM multi insert: ')
+        delete_data()
+        insert_data(data_list, team_list, 'multi')
+        delete_data()
+        sys.stderr.write('SqlAlchemy ORM bulk insert: ')
+        delete_data()
+        insert_data(data_list, team_list, 'bulk')
+        delete_data()
+        sys.stderr.write('SqlAlchemy core bulk insert: ')
+        delete_data()
+        insert_data(data_list, team_list, 'core')
+
+        
     else:
         print("Please input correct mode.\n")
         print(argp.parse_args('-h'.split()))

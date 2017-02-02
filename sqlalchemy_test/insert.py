@@ -3,6 +3,7 @@
 from __future__ import absolute_import, with_statement, print_function, unicode_literals
 import sqlalchemy_test.database as database
 from sqlalchemy_test.model.user import User
+from sqlalchemy_test.model.user import UserTable
 from sqlalchemy_test.model.team import Team
 from joblib import Parallel, delayed
 import time
@@ -42,6 +43,25 @@ def multi_insertion(data_list, team_list):
     database.session().add_all(users)
     database.session().commit()
     print('elapsed time of insertion: {0:.3f} [sec]'.format(time.time() - start))
+    
+    
+def bulk_insertion(data_list, team_list):
+    teams = [Team(t) for t in team_list]
+    database.session().add_all(teams)
+    database.session().commit()
+    teams = Team.query().all()
+    team_dict = {t.name: t for t in teams}
+    start = time.time()
+    # database.session().bulk_save_objects(users, return_defaults=True)
+    database.session().bulk_save_objects(
+        [UserTable(name=d[0],
+                   age=d[1],
+                   team_id=team_dict[d[2]].id,
+                   updated_at = time.time(),
+                   created_at = time.time())
+         for d in data_list], return_defaults=True)
+    database.session().commit()
+    print('elapsed time of insertion: {0:.3f} [sec]'.format(time.time() - start))
 
 
 def core_insertion(data_list, team_list):
@@ -57,12 +77,14 @@ def core_insertion(data_list, team_list):
     database.session().commit()
     print('elapsed time of insertion: {0:.3f} [sec]'.format(time.time() - start))
 
-
+    
 def insert_data(data_list, team_list, option):
     if option == 'single':
         single_insertion(data_list, team_list)
     elif option == 'multi':
         multi_insertion(data_list, team_list)
+    elif option == 'bulk':
+        bulk_insertion(data_list, team_list)
     elif option == 'core':
         core_insertion(data_list, team_list)
     else:

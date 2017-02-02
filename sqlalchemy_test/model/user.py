@@ -4,6 +4,8 @@ from __future__ import absolute_import, with_statement, print_function, unicode_
 from sqlalchemy import Table, Column, BigInteger, Unicode, ForeignKey, Integer
 from sqlalchemy.orm import mapper
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
+
 
 from sqlalchemy_test.database import metadata
 from sqlalchemy_test.model.base import Base
@@ -50,3 +52,17 @@ mapper(User, signup_user,
        })
 
 User.__table__ = signup_user
+
+
+Base = declarative_base()
+
+
+class UserTable(Base):
+    __tablename__ = "user"
+    id = Column(BigInteger,  nullable=False,
+                primary_key=True, autoincrement=True)
+    name = Column(Unicode(255), nullable=False)
+    age = Column(Integer, nullable=False)
+    team_id = Column(BigInteger, nullable=False)
+    updated_at = Column(BigInteger, nullable=False)
+    created_at = Column(BigInteger, nullable=False)
