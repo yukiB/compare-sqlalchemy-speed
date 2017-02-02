@@ -1,0 +1,13 @@
+*.log
+*.DS_Store
+
+# Python
+.python-version
+*.pyc
+/build
+/dist
+*.egg-info
+.eggs
+
+# compare-sqlalchemy-speed
+/resources/config/*.json
