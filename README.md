@@ -86,7 +86,7 @@ This option has three types:
 - core:  select with sqlalchemy core
 - multi: parallelized selection using multiprocessing
 
-You can also test two selection types using `--select_type` option.
+You can also test three selection types using `--select_type` option.
 
 - user:  select 100 users in deceingin order of age.
 
