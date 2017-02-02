@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import absolute_import, with_statement, print_function, unicode_literals
+import logging
+import logging.config
+import argparse
+import sqlalchemy_test.config as config
+import sqlalchemy_test.database as database
+from sqlalchemy_test.model.user import User
+from sqlalchemy_test.model.team import Team
+from sqlalchemy_test.data import create_data_list
+from sqlalchemy_test.insert import insert_data
+import time
+import re
+import sys
+import io
+
+logger = logging.getLogger(__name__)
+
+if __name__ == '__main__':
+    argp = argparse.ArgumentParser()
+    argp.add_argument("mode",
+                      help="Mode of data management. (insert/select)")
+    argp.add_argument("-i", "--insert_option", dest="insert_option", type=str, default="single",
+                      help="Chose insertion ways (single/multi/core default: 'single')")
+    argp.add_argument("-s", "--select_option", dest="select_option", type=str, default="orm",
+                      help="Chose selection ways (orm/core/multi default: 'orm')")
+    argp.add_argument("-u", "--user_num", dest="n_user", type=int, default=3000,
+                      help="Number of users (default: 30000)")
+    argp.add_argument("-t", "--team_num", dest="n_team", type=int, default=10,
+                      help="Number of teams (default: 10)")
+    argp.add_argument("--config-db", dest="config_db", type=str, default="./resources/config/database.json",
+                      help="Database configuration file path (default: ./resources/config/database.json)")
+
+    args = argp.parse_args()
+    config.set_db(args.config_db)
+    database.init(config.get("DATABASE_URI"))
+
+    mode = args.mode
+
+    start = time.time()
+
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+    if str(mode) == 'insert':
+        User.query().delete()
+        Team.query().delete()
+        database.session().commit()
+        database.session().execute("ALTER TABLE user AUTO_INCREMENT = 1;")
+        database.session().execute("ALTER TABLE team AUTO_INCREMENT = 1;")
+        database.session().commit()
+
+        data_list, team_list = create_data_list(args.n_user, args.n_team)
+        print('Created Data.')
+        s = time.time()
+        insert_data(data_list, team_list, args.insert_option)
+        print('total elapsed time: {0:.3f} [sec]'.format(time.time() - s))
+
+    elif str(mode) == "select":
+        print('selection')
+
+    else:
+        print("Please input correct mode.\n")
+        print(argp.parse_args('-h'.split()))
