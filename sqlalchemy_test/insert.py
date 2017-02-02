@@ -6,7 +6,7 @@ from sqlalchemy_test.model.user import User
 from sqlalchemy_test.model.user import UserTable
 from sqlalchemy_test.model.team import Team
 from joblib import Parallel, delayed
-import time
+import time, sys
 
 
 def insert_team(team_name):
@@ -26,6 +26,7 @@ def single_insertion(data_list, team_list):
     team_dict = {t: insert_team(t) for t in team_list}
     start = time.time()
     [insert_user(d[0], d[1], team_dict[d[2]]) for d in data_list]
+    sys.stderr.write('SqlAlchemy ORM: ')
     print('elapsed time of insertion: {0:.3f} [sec]'.format(time.time() - start))
 
 
@@ -42,6 +43,7 @@ def multi_insertion(data_list, team_list):
     start = time.time()
     database.session().add_all(users)
     database.session().commit()
+    sys.stderr.write('SqlAlchemy ORM multi insert: ')
     print('elapsed time of insertion: {0:.3f} [sec]'.format(time.time() - start))
     
     
@@ -61,6 +63,7 @@ def bulk_insertion(data_list, team_list):
                    created_at = time.time())
          for d in data_list], return_defaults=True)
     database.session().commit()
+    sys.stderr.write('SqlAlchemy ORM bulk insert: ')
     print('elapsed time of insertion: {0:.3f} [sec]'.format(time.time() - start))
 
 
@@ -75,6 +78,7 @@ def core_insertion(data_list, team_list):
     start = time.time()
     database.session().execute(User.__table__.insert(), users)
     database.session().commit()
+    sys.stderr.write('SqlAlchemy core bulk insert: ')
     print('elapsed time of insertion: {0:.3f} [sec]'.format(time.time() - start))
 
     
