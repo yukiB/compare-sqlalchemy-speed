@@ -64,7 +64,6 @@ if __name__ == '__main__':
         s = time.time()
         result = select_data(args.select_option, args.select_type)
         print('elapsed time: {0:.4f} [sec]'.format(time.time() - s))
-        print(result)
     else:
         print("Please input correct mode.\n")
         print(argp.parse_args('-h'.split()))
