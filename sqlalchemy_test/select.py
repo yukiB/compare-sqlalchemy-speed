@@ -175,6 +175,16 @@ def count_user_core():
     return counts
 
 
+def count_user_core_fixed():
+    u = User.__table__.c
+    t = User.__table__.c
+    sel = select([func.distinct(t.id), t.name, func.count()])\
+          .select_from(User.__table__.join(Team.__table__, t.id == u.team_id))\
+          .where(u.age < 50).group_by(t.id)
+    counts = {r[1]: r[2] for r in database.session().execute(sel)}
+    return counts
+
+
 def count_user(team):
     global _session
     u = User.__table__.c
@@ -194,7 +204,6 @@ def count_user_multi():
     p.close()
     _session.close()
     return counts
-    
 
 
 def count_users(option):
@@ -202,6 +211,8 @@ def count_users(option):
         result = count_user_orm()
     elif option == 'core':
         result = count_user_core()
+    elif option == 'core2':
+        result = count_user_core_fixed()
     elif option == 'multi':
         result = count_user_multi()
     else:
